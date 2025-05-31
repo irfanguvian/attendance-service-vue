@@ -1,0 +1,33 @@
+@import './base.css';
+
+#app {
+  /* max-width: 1280px; */ /* Removed to allow full width */
+  /* margin: 0 auto; */ /* Removed to allow full width */
+  /* padding: 0 2rem; */ /* Remove padding from #app, will be handled by child elements or specific pages */
+  font-weight: normal;
+  width: 100%; /* Ensure #app tries to use available width */
+  min-height: 100vh; /* Ensure #app takes at least full viewport height */
+  display: flex; /* Added to enable flex column layout for App.vue */
+  flex-direction: column; /* Added for App.vue header/main structure */
+}
+
+a,
+.green {
+  text-decoration: none;
+  color: hsla(160, 100%, 37%, 1);
+  transition: 0.4s;
+  padding: 3px;
+}
+
+@media (hover: hover) {
+  a:hover {
+    background-color: hsla(160, 100%, 37%, 0.2);
+  }
+}
+
+@media (min-width: 1024px) {
+  body {
+    display: flex; /* This can stay if you want body to center #app in very large screens, but #app itself is now full width */
+    place-items: flex-start; /* Changed from center to flex-start as #app is full height */
+  }
+}
