@@ -1,17 +1,26 @@
 import Vue from 'vue';
 import App from './App.vue';
-import router from './router'; // Your Vue Router 2.x/3.x instance
-import { createPinia, PiniaVuePlugin } from 'pinia'; // Pinia v1 for Vue 2
+import router, { setupRouterGuards } from './router'; // Import router and setupRouterGuards
+import { createPinia, PiniaVuePlugin } from 'pinia';
 
 import './assets/main.css';
 
-Vue.use(PiniaVuePlugin); // Use PiniaVuePlugin for Vue 2
+Vue.use(PiniaVuePlugin);
 const pinia = createPinia();
+
+// Call setupRouterGuards and pass the pinia instance
+setupRouterGuards(pinia);
 
 Vue.config.productionTip = false;
 
 new Vue({
   router,
-  pinia, // Pass the pinia instance
+  pinia, // Provide pinia to the Vue instance
+  created() {
+    // The auth check is now primarily handled by the router guard
+    // but ensuring the store is initialized here is still good practice.
+    // const authStore = useAuthStore(pinia); // Pass pinia instance
+    // authStore.checkAuth(); // This can be removed if router guard handles it sufficiently
+  },
   render: h => h(App),
 }).$mount('#app');

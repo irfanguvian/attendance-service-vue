@@ -5,8 +5,8 @@
         <h1 class="login-title">Attendance Management</h1>
         <form @submit.prevent="handleLogin" class="login-form">
           <div class="form-group">
-            <label for="username">Username</label>
-            <input type="text" id="username" v-model="username" placeholder="Enter your username" required />
+            <label for="username">Email</label> <!-- Changed from Username to Email -->
+            <input type="text" id="username" v-model="email" placeholder="Enter your email" required />
           </div>
           <div class="form-group">
             <label for="password">Password</label>
@@ -14,35 +14,49 @@
           </div>
           <button type="submit" class="login-button">Login</button>
         </form>
+        <p v-if="errorMessage" style="color: red; margin-top: 1rem;">{{ errorMessage }}</p> <!-- Display error message -->
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import { useAuthStore } from '@/stores/auth';
+import { mapActions, mapState } from 'pinia';
+
 export default {
   name: 'LoginPage',
   data() {
     return {
-      username: '',
+      email: '', // Changed from username to email to match API
       password: '',
+      errorMessage: '' // To display login errors
     };
   },
+  computed: {
+    ...mapState(useAuthStore, ['authError'])
+  },
   methods: {
-    handleLogin() {
-      // Mock login logic
-      if (this.username === 'admin' && this.password === 'password') {
-        console.log('Login successful');
-        // Simulate storing a token or user session
-        localStorage.setItem('user-token', 'mock-token'); // Example token
+    ...mapActions(useAuthStore, ['login']),
+    async handleLogin() {
+      this.errorMessage = ''; // Clear previous errors
+      const success = await this.login({ email: this.email, password: this.password });
+      if (success) {
         this.$router.push('/'); // Redirect to dashboard
       } else {
-        alert('Invalid credentials. Please try again.');
-        // Clear password field for security
-        this.password = '';
+        // Error message will be set in the store, or use a local one
+        this.errorMessage = this.authError || 'Invalid credentials. Please try again.';
+        this.password = ''; // Clear password field
       }
     },
   },
+  watch: {
+    authError(newError) {
+      if (newError) {
+        this.errorMessage = newError;
+      }
+    }
+  }
 };
 </script>
 

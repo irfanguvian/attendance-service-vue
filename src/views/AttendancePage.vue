@@ -2,21 +2,15 @@
   <div class="attendance-page">
     <div class="page-header">
       <h1 class="page-title">Attendance Management</h1>
-      <!-- Optional: Add a button here if needed, e.g., for bulk actions or reports -->
     </div>
 
     <div class="content-layout">
       <div class="form-section card">
-        <AttendanceForm 
-          :employees="employees"
-          @save-attendance="handleSaveAttendance"
-        />
+        <AttendanceForm @attendance-created="handleAttendanceCreated" />
       </div>
 
       <div class="list-section card">
-        <AttendanceList 
-          :attendanceRecords="attendanceRecords"
-        />
+        <AttendanceList ref="attendanceListRef" />
       </div>
     </div>
 
@@ -26,8 +20,6 @@
 <script>
 import AttendanceForm from '@/components/attendance/AttendanceForm.vue';
 import AttendanceList from '@/components/attendance/AttendanceList.vue';
-// import { useEmployeeStore } from '@/stores/employeeStore'; // For fetching employees
-// import { useAttendanceStore } from '@/stores/attendanceStore'; // For managing attendance
 
 export default {
   name: 'AttendancePage',
@@ -35,75 +27,13 @@ export default {
     AttendanceForm,
     AttendanceList,
   },
-  data() {
-    return {
-      employees: [], // Mock employee data
-      attendanceRecords: [], // Mock attendance records
-      // Mock IDs for employees, replace with actual data handling
-      nextEmployeeId: 1,
-      nextAttendanceRecordId: 1, 
-    };
-  },
-  // setup() {
-  //   const employeeStore = useEmployeeStore();
-  //   const attendanceStore = useAttendanceStore();
-  //   // Fetch employees if not already loaded
-  //   if (employeeStore.employees.length === 0) {
-  //     employeeStore.fetchEmployees();
-  //   }
-  //   // Fetch initial attendance records if needed
-  //   // attendanceStore.fetchAttendanceRecords(); 
-  //   return { employeeStore, attendanceStore };
-  // },
   methods: {
-    loadMockEmployees() {
-      // In a real app, this would come from a Pinia store (employeeStore)
-      this.employees = [
-        { id: this.nextEmployeeId++, name: 'Alice Wonderland', position: 'Frontend Developer' },
-        { id: this.nextEmployeeId++, name: 'Bob The Builder', position: 'Backend Developer' },
-        { id: this.nextEmployeeId++, name: 'Charlie Brown', position: 'UI/UX Designer' },
-        { id: this.nextEmployeeId++, name: 'Diana Prince', position: 'Project Manager' },
-      ];
+    handleAttendanceCreated() {
+      // Call the refreshList method on the AttendanceList component
+      if (this.$refs.attendanceListRef) {
+        this.$refs.attendanceListRef.refreshList();
+      }
     },
-    loadMockAttendanceRecords() {
-        // Mock initial records, or fetch from store
-        this.attendanceRecords = [
-            {
-                id: this.nextAttendanceRecordId++,
-                employeeId: 1,
-                employeeName: 'Alice Wonderland',
-                date: '2025-05-30',
-                status: 'Present',
-                remarks: ''
-            },
-            {
-                id: this.nextAttendanceRecordId++,
-                employeeId: 2,
-                employeeName: 'Bob The Builder',
-                date: '2025-05-30',
-                status: 'Absent',
-                remarks: 'Sick leave'
-            }
-        ];
-    },
-    handleSaveAttendance(record) {
-      // In a real app, this would call an action in a Pinia store (attendanceStore)
-      // e.g., this.attendanceStore.addAttendanceRecord(record);
-      const newRecord = {
-        ...record,
-        id: this.nextAttendanceRecordId++ // Assign a mock ID
-      };
-      this.attendanceRecords.unshift(newRecord); // Add to the beginning of the list
-      console.log('Attendance Recorded:', newRecord);
-      alert('Attendance recorded successfully!');
-    },
-  },
-  created() {
-    this.loadMockEmployees();
-    this.loadMockAttendanceRecords();
-    // Access store data if using Pinia
-    // this.employees = this.employeeStore.employees;
-    // this.attendanceRecords = this.attendanceStore.records;
   },
 };
 </script>

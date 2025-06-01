@@ -1,5 +1,6 @@
 <template>
   <div id="app">
+    <ToasterNotification ref="toaster" /> <!-- Add ToasterNotification component -->
     <header v-if="!isLoginPage" class="app-header">
       <div class="header-content">
         <div class="logo"></div>
@@ -24,8 +25,14 @@
 </template>
 
 <script>
+import { useAuthStore } from '@/stores/auth';
+import ToasterNotification from '@/components/common/ToasterNotification.vue'; // Import Toaster
+
 export default {
   name: 'App',
+  components: {
+    ToasterNotification, // Register Toaster
+  },
   data() {
     return {
       isMobileNavOpen: false,
@@ -37,10 +44,9 @@ export default {
     }
   },
   methods: {
-    logout() {
-      console.log('Logout clicked');
-      localStorage.removeItem('user-token');
-      this.$router.push('/login');
+    async performLogout() {
+      const authStore = useAuthStore();
+      await authStore.signout();
     },
     toggleMobileNav() {
       this.isMobileNavOpen = !this.isMobileNavOpen;
@@ -48,9 +54,18 @@ export default {
     closeMobileNav() {
       this.isMobileNavOpen = false;
     },
-    logoutAndCloseMobileNav() {
-      this.logout();
+    async logoutAndCloseMobileNav() {
+      await this.performLogout();
       this.closeMobileNav();
+    },
+    showToast(message, type = 'info', duration = 3000) {
+      if (this.$refs.toaster) {
+        this.$refs.toaster.showToast(message, type, duration);
+      } else {
+        // Fallback if toaster is not yet available (e.g. during early mount)
+        // This uses the event bus method, assuming toaster listens to $root.$on
+        this.$root.$emit('show-toast', { message, type, duration });
+      }
     }
   },
   watch: {

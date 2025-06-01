@@ -1,186 +1,138 @@
 <template>
   <div class="attendance-form-container">
-    <form @submit.prevent="submitAttendance" class="attendance-form">
-      <h3 class="form-title">Record Attendance</h3>
+    <h3 style="color: black;">Record Attendance</h3>
+    <form @submit.prevent="handleSubmit" class="form">
       <div class="form-group">
-        <label for="employee">Employee:</label>
-        <select id="employee" v-model="selectedEmployeeId" required class="form-control">
-          <option disabled value="">Please select an employee</option>
-          <option v-for="employee in employees" :key="employee.id" :value="employee.id">
-            {{ employee.name }} ({{ employee.position }})
-          </option>
-        </select>
+        <label for="employee_id">Employee ID:</label>
+        <input type="number" id="employee_id" v-model.number="formData.employee_id" required />
       </div>
-
       <div class="form-group">
-        <label for="attendanceDate">Date:</label>
-        <input type="date" id="attendanceDate" v-model="attendanceDate" required class="form-control" />
+        <label for="clock_in">Clock-in Time:</label>
+        <input type="datetime-local" id="clock_in" v-model="formData.clock_in" required />
       </div>
-
-      <div class="form-group">
-        <label>Status:</label>
-        <div class="status-options">
-          <label v-for="statusOption in attendanceStatuses" :key="statusOption.value" class="radio-label">
-            <input type="radio" :value="statusOption.value" v-model="selectedStatus" name="attendanceStatus" required />
-            <span class="status-text">{{ statusOption.label }}</span>
-          </label>
-        </div>
-      </div>
-      
-      <div class="form-group" v-if="selectedStatus === 'Late' || selectedStatus === 'Absent' || selectedStatus === 'On Leave'">
-        <label for="remarks">Remarks <span v-if="selectedStatus === 'Late'">(e.g., reason for lateness)</span>:</label>
-        <textarea id="remarks" v-model="remarks" placeholder="Optional remarks" class="form-control" rows="3"></textarea>
-      </div>
-
-      <button type="submit" class="btn btn-primary submit-btn">Record Attendance</button>
+      <button type="submit" class="btn-submit">Submit</button>
     </form>
   </div>
 </template>
 
 <script>
+import attendanceService from '../../services/attendanceService';
+import { formatISO } from 'date-fns'; // Using date-fns for robust ISO 8601 formatting
+
 export default {
   name: 'AttendanceForm',
-  props: {
-    employees: {
-      type: Array,
-      required: true,
-      default: () => []
-    }
-  },
   data() {
     return {
-      selectedEmployeeId: '',
-      attendanceDate: new Date().toISOString().slice(0, 10), // Default to today
-      selectedStatus: 'Present', // Default status
-      remarks: '',
-      attendanceStatuses: [
-        { label: 'Present', value: 'Present' },
-        { label: 'Absent', value: 'Absent' },
-        { label: 'Late', value: 'Late' },
-        { label: 'On Leave', value: 'On Leave' },
-      ],
+      formData: {
+        employee_id: null,
+        clock_in: this.getCurrentDateTimeLocal(),
+      },
     };
   },
   methods: {
-    submitAttendance() {
-      if (!this.selectedEmployeeId) {
-        alert('Please select an employee.');
+    showGlobalToast(message, type) {
+      this.$root.$emit('show-toast', { message, type });
+    },
+    getErrorMessage(err, defaultMessage) {
+      if (err && err.response && err.response.data && err.response.data.message) {
+        return err.response.data.message;
+      }
+      if (err && err.message) {
+        return err.message;
+      }
+      return defaultMessage;
+    },
+    getCurrentDateTimeLocal() {
+      const now = new Date();
+      // Adjust for local timezone
+      const timezoneOffset = now.getTimezoneOffset() * 60000; // in milliseconds
+      const localISOTime = new Date(now - timezoneOffset).toISOString().slice(0, 16);
+      return localISOTime;
+    },
+    async handleSubmit() {
+      if (!this.formData.employee_id || !this.formData.clock_in) {
+        this.showGlobalToast('Employee ID and Clock-in time are required.', 'error');
         return;
       }
-      const attendanceRecord = {
-        employeeId: this.selectedEmployeeId,
-        employeeName: this.employees.find(e => e.id === this.selectedEmployeeId)?.name || 'N/A',
-        date: this.attendanceDate,
-        status: this.selectedStatus,
-        remarks: (this.selectedStatus === 'Late' || this.selectedStatus === 'Absent' || this.selectedStatus === 'On Leave') ? this.remarks : ''
-      };
-      this.$emit('save-attendance', attendanceRecord);
-      // Reset form (optional, could be done by parent)
-      // this.selectedEmployeeId = '';
-      // this.selectedStatus = 'Present';
-      // this.remarks = '';
-      // this.attendanceDate = new Date().toISOString().slice(0,10);
+
+      try {
+        // Convert local datetime-local string to ISO 8601 format with timezone
+        // The API expects: "2025-05-01T13:12:03+07:00"
+        // datetime-local input gives "YYYY-MM-DDTHH:mm"
+        const date = new Date(this.formData.clock_in);
+        const isoString = formatISO(date); // date-fns handles timezone correctly based on system
+
+        const payload = {
+          employee_id: this.formData.employee_id,
+          clock_in: isoString,
+        };
+
+        await attendanceService.createAttendance(payload);
+        this.showGlobalToast('Attendance recorded successfully!', 'success');
+        this.$emit('attendance-created'); // Emit event to refresh list
+        // Reset form
+        this.formData.employee_id = null;
+        this.formData.clock_in = this.getCurrentDateTimeLocal();
+      } catch (error) {
+        console.error('Error creating attendance:', error);
+        const errorMessage = this.getErrorMessage(error, 'Failed to record attendance.');
+        this.showGlobalToast(errorMessage, 'error');
+      }
     },
   },
+  mounted() {
+    // Ensure date-fns is available or install it
+    // npm install date-fns
+    // For this environment, we assume it's installed.
+  }
 };
 </script>
 
 <style scoped>
-/* .attendance-form-container is now styled by .card in parent */
+.attendance-form-container {
+  background-color: #f9f9f9;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
 
-.form-title {
-  color: #2c3e50; /* Dark Blue */
-  text-align: center;
-  margin-bottom: 1.5rem;
-  font-size: 1.5rem;
-  font-weight: 600;
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
 }
 
 .form-group {
-  margin-bottom: 1.25rem;
+  display: flex;
+  flex-direction: column;
 }
 
 .form-group label {
-  display: block;
-  margin-bottom: 0.5rem;
-  font-weight: 500;
-  color: #34495e; /* Slightly lighter blue-grey */
-  font-size: 0.9rem;
-}
-
-.form-control {
-  width: 100%;
-  padding: 0.75rem 1rem;
-  border: 1px solid #bdc3c7; /* Light grey border */
-  border-radius: 6px;
-  box-sizing: border-box;
-  font-size: 1rem;
-  transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-}
-
-.form-control:focus {
-  border-color: #3498db; /* Blue focus */
-  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
-  outline: none;
-}
-
-.status-options {
-  display: flex;
-  flex-wrap: wrap; /* Allow wrapping for multiple options */
-  gap: 0.75rem; /* Space between radio buttons */
-}
-
-.radio-label {
-  display: flex;
-  align-items: center;
-  font-weight: normal;
+  margin-bottom: 5px;
+  font-weight: bold;
   color: #333;
-  cursor: pointer;
-  padding: 0.5rem 0.75rem;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  transition: background-color 0.2s ease, border-color 0.2s ease;
 }
 
-.radio-label:hover {
-  background-color: #f0f0f0;
-}
-
-.radio-label input[type="radio"] {
-  margin-right: 0.5rem;
-  accent-color: #3498db; /* Blue for radio button */
-  transform: scale(1.1);
-}
-
-.radio-label input[type="radio"]:checked + .status-text {
-  font-weight: 500;
-  color: #3498db;
-}
-
-.radio-label.selected {
-    border-color: #3498db;
-    background-color: #eaf5fc;
-}
-
-.submit-btn {
-  /* Assuming .btn and .btn-primary are defined globally or in App.vue */
-  padding: 0.75rem 1.5rem;
+.form-group input {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
   font-size: 1rem;
-  width: 100%;
-  margin-top: 0.5rem;
 }
 
-/* Responsive adjustments */
-@media (max-width: 480px) {
-  .form-title {
-    font-size: 1.25rem;
-  }
-  .status-options {
-    flex-direction: column; /* Stack radio buttons on very small screens */
-    align-items: flex-start;
-  }
-  .radio-label {
-    width: 100%; /* Make labels full width */
-  }
+.btn-submit {
+  padding: 10px 15px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s ease;
+}
+
+.btn-submit:hover {
+  background-color: #0056b3;
 }
 </style>

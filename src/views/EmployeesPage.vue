@@ -2,9 +2,6 @@
   <div class="employees-page">
     <div class="page-header">
       <h1 class="page-title">Employees Management</h1>
-      <button @click="openAddModal" class="btn btn-primary add-employee-btn">
-        <span class="icon">&#43;</span> Add New Employee
-      </button>
     </div>
 
     <EmployeeTable 
@@ -47,10 +44,6 @@ export default {
   //   return { employeeStore };
   // },
   methods: {
-    openAddModal() {
-      this.selectedEmployee = null;
-      this.showModal = true;
-    },
     openEditModal(employee) {
       this.selectedEmployee = { ...employee }; // Pass a copy to avoid direct mutation
       this.showModal = true;

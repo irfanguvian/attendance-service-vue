@@ -1,13 +1,13 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
-
-// Import your page components here
-// We will create these placeholder files next
 import LoginPage from '../views/LoginPage.vue';
 import DashboardPage from '../views/DashboardPage.vue';
 import EmployeesPage from '../views/EmployeesPage.vue';
 import AttendancePage from '../views/AttendancePage.vue';
 import SalaryPage from '../views/SalaryPage.vue';
+
+// Import useAuthStore directly. It's the store definition.
+import { useAuthStore } from '../stores/auth';
 
 Vue.use(VueRouter);
 
@@ -21,7 +21,7 @@ const routes = [
     path: '/',
     name: 'Dashboard',
     component: DashboardPage,
-    meta: { requiresAuth: true } // Example for protected routes
+    meta: { requiresAuth: true }
   },
   {
     path: '/employees',
@@ -41,32 +41,49 @@ const routes = [
     component: SalaryPage,
     meta: { requiresAuth: true }
   },
-  // Redirect to login if no other route matches and not authenticated
-  // or to dashboard if authenticated
   {
     path: '*',
-    redirect: '/', // Or '/login' depending on auth logic
+    redirect: '/',
   },
 ];
 
 const router = new VueRouter({
-  mode: 'history', // Use history mode for cleaner URLs
-  base: "/", // Base URL for the application
+  mode: 'history',
+  base: "/",
   routes,
 });
 
-// Navigation guard (optional, for authentication)
-router.beforeEach((to, from, next) => {
-  const isAuthenticated = !!localStorage.getItem('user-token'); // Example auth check
-  const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
+// Export a function to setup navigation guards
+export function setupRouterGuards(piniaInstance) {
+  router.beforeEach(async (to, from, next) => {
+    // Use the passed piniaInstance when calling useAuthStore
+    const authStore = useAuthStore(piniaInstance);
 
-  if (requiresAuth && !isAuthenticated) {
-    next('/login');
-  } else if (to.name === 'Login' && isAuthenticated) {
-    next('/'); // If user is authenticated and tries to go to login, redirect to dashboard
-  } else {
-    next();
-  }
-});
+    // Always call checkAuth to ensure the store reflects the latest token status from localStorage.
+    // checkAuth() will update isAuthenticated based on token presence.
+    authStore.checkAuth(); 
+
+    const isAuthenticated = authStore.isAuthenticated;
+
+    // If trying to access login page while already authenticated
+    if (to.path === '/login' && isAuthenticated) {
+      next({ path: '/' }); // Redirect to dashboard or home
+      return; // Important to return after calling next()
+    }
+
+    // If route requires authentication
+    if (to.matched.some(record => record.meta.requiresAuth)) {
+      if (!isAuthenticated) {
+        next({
+          path: '/login',
+        });
+      } else {
+        next(); // Proceed if authenticated
+      }
+    } else {
+      next(); // For public routes, always proceed
+    }
+  });
+}
 
 export default router;
