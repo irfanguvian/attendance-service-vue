@@ -13,7 +13,7 @@
           <router-link to="/" @click.native="closeMobileNav">Dashboard</router-link>
           <router-link to="/employees" @click.native="closeMobileNav">Employees</router-link>
           <router-link to="/attendance" @click.native="closeMobileNav">Attendance</router-link>
-          <router-link to="/salary" @click.native="closeMobileNav">Salary</router-link>
+          <router-link to="/salary" @click.native="closeMobileNav">Salary</router-link> <!-- Ensure this link is present -->
           <button @click="logoutAndCloseMobileNav" class="logout-button">Logout</button>
         </nav>
       </div>

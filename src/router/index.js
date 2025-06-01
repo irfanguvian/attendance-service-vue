@@ -4,7 +4,7 @@ import LoginPage from '../views/LoginPage.vue';
 import DashboardPage from '../views/DashboardPage.vue';
 import EmployeesPage from '../views/EmployeesPage.vue';
 import AttendancePage from '../views/AttendancePage.vue';
-import SalaryPage from '../views/SalaryPage.vue';
+import SalaryPage from '../views/SalaryPage.vue'; // Ensure this import is present
 
 // Import useAuthStore directly. It's the store definition.
 import { useAuthStore } from '../stores/auth';
@@ -38,7 +38,7 @@ const routes = [
   {
     path: '/salary',
     name: 'Salary',
-    component: SalaryPage,
+    component: SalaryPage, // Ensure this component is correctly assigned
     meta: { requiresAuth: true }
   },
   {

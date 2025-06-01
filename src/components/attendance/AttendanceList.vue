@@ -7,10 +7,10 @@
       <table v-if="attendanceRecords.length > 0" class="attendance-table">
         <thead>
           <tr>
-            <th>Employee ID</th>
+            <th>EMP ID</th>
             <th>Clock-in Time</th>
             <th>Employee Name</th> <!-- Assuming Employee details might be available -->
-            <th>Position</th> <!-- Assuming Employee details might be available -->
+            
           </tr>
         </thead>
         <tbody>
@@ -18,10 +18,10 @@
           <!-- For Employee Name and Position, we'd ideally have that data from the API -->
           <!-- If not, we might need another call or to adjust expectations -->
           <tr v-for="record in attendanceRecords" :key="record.ID">
-            <td>{{ record.EmployeeID }}</td>
+            <td>{{ record.Employee.EmpID }}</td>
             <td>{{ formatClockInTime(record.ClockIn) }}</td>
-            <td>{{ record.Employee ? record.Employee.name : 'N/A' }}</td> <!-- Placeholder for actual data -->
-            <td>{{ record.Employee ? record.Employee.position : 'N/A' }}</td> <!-- Placeholder for actual data -->
+            <td>{{ record.Employee ? record.Employee.Fullname : 'N/A' }}</td> <!-- Placeholder for actual data -->
+            
           </tr>
         </tbody>
       </table>

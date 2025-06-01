@@ -1,13 +1,12 @@
 <template>
-  <div class="date-picker-container">
-    <label :for="pickerId" class="picker-label">{{ label }}:</label>
+  <div class="month-picker-container">
+    <label for="month-year" class="picker-label">{{ label }}:</label>
     <input 
-      type="date" 
-      :id="pickerId"
-      class="date-input"
-      v-model="selectedDate"
-      @change="handleDateChange"
-      :max="maxSelectableDateComputed"
+      type="month" 
+      id="month-year" 
+      class="month-input"
+      v-model="selectedMonthYear" 
+      @change="emitMonthChange"
     />
   </div>
 </template>
@@ -18,53 +17,45 @@ export default {
   props: {
     label: {
       type: String,
-      default: 'Select Date'
+      default: 'Select Month'
     }
   },
   data() {
-    const today = new Date().toISOString().slice(0, 10);
     return {
-      selectedDate: today, // YYYY-MM-DD format
+      selectedMonthYear: this.getCurrentMonthYear(),
     };
   },
-  computed: {
-    pickerId() {
-      return `date-picker-${this._uid}`;
-    },
-    maxSelectableDateComputed() {
-      const today = new Date();
-      return today.toISOString().slice(0, 10);
-    }
-  },
   methods: {
-    handleDateChange() {
-      if (this.selectedDate) {
-        const [year, month] = this.selectedDate.split('-');
-        this.$emit('month-changed', `${year}-${month}`);
-      } else {
-        const today = new Date();
-        const year = today.getFullYear();
-        const currentMonth = (today.getMonth() + 1).toString().padStart(2, '0');
-        this.$emit('month-changed', `${year}-${currentMonth}`);
+    getCurrentMonthYear() {
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = (now.getMonth() + 1).toString().padStart(2, '0'); // JavaScript months are 0-indexed
+      return `${year}-${month}`;
+    },
+    emitMonthChange() {
+      if (this.selectedMonthYear) {
+        const [year, month] = this.selectedMonthYear.split('-');
+        this.$emit('month-selected', { year: parseInt(year), month: parseInt(month) });
       }
     },
   },
   mounted() {
-    this.handleDateChange(); 
-  }
+    // Emit initial month selection
+    this.emitMonthChange();
+  },
 };
 </script>
 
 <style scoped>
-.date-picker-container {
+.month-picker-container {
+  margin-bottom: 20px;
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 10px 12px;
-  background-color: #ffffff;
-  border-radius: 8px;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+  padding: 10px;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
 .picker-label {
@@ -74,7 +65,7 @@ export default {
   white-space: nowrap;
 }
 
-.date-input {
+.month-input {
   padding: 9px 10px;
   border: 1px solid #cbd5e0;
   border-radius: 6px;
@@ -85,14 +76,14 @@ export default {
   min-width: 150px;
 }
 
-.date-input:focus {
+.month-input:focus {
   border-color: #3182ce;
   box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.2);
   outline: none;
 }
 
 @media (max-width: 520px) {
-  .date-picker-container {
+  .month-picker-container {
     flex-direction: column;
     align-items: stretch;
     gap: 8px;
@@ -101,7 +92,7 @@ export default {
     margin-bottom: 3px;
     font-size: 0.85em;
   }
-  .date-input {
+  .month-input {
     width: 100%;
     font-size: 0.9em;
   }

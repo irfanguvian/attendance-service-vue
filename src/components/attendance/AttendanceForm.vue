@@ -3,8 +3,8 @@
     <h3 style="color: black;">Record Attendance</h3>
     <form @submit.prevent="handleSubmit" class="form">
       <div class="form-group">
-        <label for="employee_id">Employee ID:</label>
-        <input type="number" id="employee_id" v-model.number="formData.employee_id" required />
+        <label for="employee_id">EMP ID:</label>
+        <input type="text" id="emp_id" v-model.number="formData.emp_id" required />
       </div>
       <div class="form-group">
         <label for="clock_in">Clock-in Time:</label>
@@ -24,7 +24,7 @@ export default {
   data() {
     return {
       formData: {
-        employee_id: null,
+        emp_id: "",
         clock_in: this.getCurrentDateTimeLocal(),
       },
     };
@@ -50,7 +50,7 @@ export default {
       return localISOTime;
     },
     async handleSubmit() {
-      if (!this.formData.employee_id || !this.formData.clock_in) {
+      if (!this.formData.emp_id || !this.formData.clock_in) {
         this.showGlobalToast('Employee ID and Clock-in time are required.', 'error');
         return;
       }
@@ -63,7 +63,7 @@ export default {
         const isoString = formatISO(date); // date-fns handles timezone correctly based on system
 
         const payload = {
-          employee_id: this.formData.employee_id,
+          emp_id: this.formData.emp_id.trim(),
           clock_in: isoString,
         };
 
@@ -71,7 +71,7 @@ export default {
         this.showGlobalToast('Attendance recorded successfully!', 'success');
         this.$emit('attendance-created'); // Emit event to refresh list
         // Reset form
-        this.formData.employee_id = null;
+        this.formData.emp_id = null;
         this.formData.clock_in = this.getCurrentDateTimeLocal();
       } catch (error) {
         console.error('Error creating attendance:', error);
