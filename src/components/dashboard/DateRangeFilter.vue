@@ -6,7 +6,7 @@
     </div>
     <div class="filter-item">
       <label for="endDate" class="filter-label">To:</label>
-      <input type="date" id="endDate" class="date-input" v-model="endDate" @change="emitDateChange" :min="startDate" :max="today" />
+      <input type="date" id="endDate" class="date-input" v-model="endDate" @change="emitDateChange" :min="startDate" />
     </div>
   </div>
 </template>
@@ -16,9 +16,14 @@ export default {
   name: 'DateRangeFilter',
   data() {
     const today = new Date().toISOString().slice(0, 10);
+    const endDateMonth = new Date();
+    endDateMonth.setMonth(endDateMonth.getMonth() + 1); // Move to the next month
+    endDateMonth.setDate(0); // Set to the last day of the current month
+    const endDatePlaceHolder = endDateMonth.toISOString().slice(0, 10);
+
     return {
       startDate: today,
-      endDate: today,
+      endDate: endDatePlaceHolder,
       today: today, // To restrict end date to today
     };
   },

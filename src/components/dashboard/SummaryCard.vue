@@ -7,6 +7,7 @@
       <div class="text-content">
         <h3 class="card-title">{{ title }}</h3>
         <p class="summary-value">{{ value }}</p>
+        <p v-if="subtitle" class="card-subtitle">{{ subtitle }}</p>
       </div>
     </div>
   </div>
@@ -36,6 +37,10 @@ export default {
     iconType: {
       type: String,
       default: 'present'
+    },
+    subtitle: {
+      type: String,
+      default: null
     }
   },
   computed: {
@@ -112,6 +117,14 @@ export default {
   font-weight: 700;
   color: #1a202c;
   line-height: 1.2;
+  margin: 0;
+}
+
+.card-subtitle {
+  margin: 4px 0 0 0;
+  color: #718096;
+  font-size: 0.85em;
+  font-weight: 400;
 }
 
 .summary-card-present .icon-wrapper {
