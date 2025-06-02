@@ -1,6 +1,7 @@
 # attendance-system-vue
 
 This template should help get you started developing with Vue2 in Vite.
+[LiveVersion](https://attendance.irfanguvian.com)
 
 ## Recommended IDE Setup
 
