@@ -1,6 +1,6 @@
 # attendance-system-vue
 
-This template should help get you started developing with Vue 3 in Vite.
+This template should help get you started developing with Vue2 in Vite.
 
 ## Recommended IDE Setup
 
@@ -27,3 +27,10 @@ pnpm dev
 ```sh
 pnpm build
 ```
+
+
+**Set up environment variables:**
+    Create a `.env` file in the root directory by copying the example or creating a new one:
+    ```env
+    VITE_APP_API_BASE_URL="link"
+    ```
