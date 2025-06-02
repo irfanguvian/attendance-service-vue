@@ -11,7 +11,7 @@
     />
 
     <EmployeeModal 
-      :show="showModal"
+      :visible="showModal"
       :employeeData="selectedEmployee"
       @close="closeModal"
       @save-employee="handleSaveEmployee"
@@ -36,7 +36,7 @@ export default {
       showModal: false,
       selectedEmployee: null, // Used for editing
       employees: [], // Mock data, will be replaced by Pinia store later
-      nextId: 4, // Mock ID counter
+      nextId: 0, // Mock ID counter
     };
   },
   // setup() {

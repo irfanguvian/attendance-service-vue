@@ -1,11 +1,7 @@
 <template>
   <div class="monthly-trend-card card">
-    <h3 class="card-title">{{ trend.month | formatMonthYear }}</h3>
+    <h3 class="card-title">Monthly Performance Insights</h3>
     <div class="trend-details">
-      <div class="detail-item">
-        <span class="label">Total Working Days:</span>
-        <span class="value">{{ trend.total_working_days }}</span>
-      </div>
       <div class="detail-item">
         <span class="label">Total Salary Disbursed:</span>
         <span class="value">{{ trend.total_salary_disbursed | formatCurrency }}</span>

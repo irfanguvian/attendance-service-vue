@@ -99,13 +99,15 @@ export default {
       try {
         const response = await employeeService.listEmployees(this.currentPage, this.limit);
         if (response.data.success) {
-          this.employees = response.data.data.employees;
-          this.totalPages = response.data.data.total_page;
-          this.currentPage = response.data.data.page;
+          this.employees = response.data.data.employees || []; // Ensure employees is an array
+          this.totalPages = response.data.data.total_page || 0;
+          this.currentPage = response.data.data.page || 1;
         } else {
           const message = response.data.message || 'Failed to load employees.';
           this.error = message; // Set table-level error
           this.showGlobalToast(message, 'error');
+          this.employees = []; // Ensure employees is an array on failure
+          this.totalPages = 0;
         }
       } catch (err) {
         const message = this.getErrorMessage(err, 'An error occurred while fetching employees.');

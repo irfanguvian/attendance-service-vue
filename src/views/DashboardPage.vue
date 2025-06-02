@@ -38,7 +38,6 @@
     </div>
 
     <div class="monthly-trends-section" v-if="monthlyTrends && monthlyTrends.length > 0">
-      <h3 class="section-title">Monthly Performance Insights</h3>
       <div class="trends-grid">
         <MonthlyTrendCard 
           v-for="(trend, index) in monthlyTrends" 
