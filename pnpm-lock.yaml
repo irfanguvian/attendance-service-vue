@@ -24,8 +24,8 @@ importers:
         specifier: ^2.7.16
         version: 2.7.16
       vue-demi:
-        specifier: ^0.14.7
-        version: 0.14.10(vue@2.7.16)
+        specifier: 0.14.7
+        version: 0.14.7(vue@2.7.16)
       vue-router:
         specifier: ^3.6.5
         version: 3.6.5(vue@2.7.16)
@@ -515,6 +515,17 @@ packages:
       '@vue/composition-api':
         optional: true
 
+  vue-demi@0.14.7:
+    resolution: {integrity: sha512-EOG8KXDQNwkJILkx/gPcoL/7vH+hORoBaKgGe+6W7VFMvCYJfmF2dGbvgDroVnI8LU7/kTu8mbjRZGBU1z9NTA==}
+    engines: {node: '>=12'}
+    hasBin: true
+    peerDependencies:
+      '@vue/composition-api': ^1.0.0-rc.1
+      vue: ^3.0.0-0 || ^2.6.0
+    peerDependenciesMeta:
+      '@vue/composition-api':
+        optional: true
+
   vue-router@3.6.5:
     resolution: {integrity: sha512-VYXZQLtjuvKxxcshuRAwjHnciqZVoXAjTjcqBTz4rKc8qih9g9pI3hbDjmqXaHdgL3v8pV6P8Z335XvHzESxLQ==}
     peerDependencies:
@@ -879,6 +890,10 @@ snapshots:
       fsevents: 2.3.3
 
   vue-demi@0.14.10(vue@2.7.16):
+    dependencies:
+      vue: 2.7.16
+
+  vue-demi@0.14.7(vue@2.7.16):
     dependencies:
       vue: 2.7.16
 
