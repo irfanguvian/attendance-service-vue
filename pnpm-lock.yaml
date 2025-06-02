@@ -24,7 +24,7 @@ importers:
         specifier: ^2.7.16
         version: 2.7.16
       vue-demi:
-        specifier: ^0.14.10
+        specifier: ^0.14.7
         version: 0.14.10(vue@2.7.16)
       vue-router:
         specifier: ^3.6.5
