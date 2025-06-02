@@ -35,13 +35,6 @@
           :chartData="dailyPresenceData" 
         />
       </div>
-      <div class="chart-wrapper">
-        <DataChart 
-          chartId="monthlySalaryChart" 
-          title="Monthly Total Salary Trend (Mock Data)"
-          :chartData="monthlySalaryData" 
-        />
-      </div>
     </div>
 
     <div class="monthly-trends-section" v-if="monthlyTrends && monthlyTrends.length > 0">
